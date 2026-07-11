@@ -47,11 +47,14 @@ provider configured to actually send the code:
    "Have an existing email login?" option, and the phone-linking prompt shown to those accounts
    once they're in the dashboard).
 
-### Optional but recommended for local testing: disable email confirmation
+### Required: disable email confirmation
 
-By default Supabase requires users to click a confirmation link before they can log in with email.
-For quick local testing, go to **Authentication → Providers → Email** and turn off **Confirm
-email**. Turn it back on before going live.
+By default Supabase requires users to click a confirmation link before an email/password account
+can log in. Doopido's email signup flow assumes this is **off** — it expects a session back
+immediately and drops the user straight into profile completion, with no "check your email" step.
+Go to **Authentication → Providers → Email** and turn off **Confirm email**. If you ever want to
+require confirmation later, that's a product decision to revisit — the signup UI would need a
+"check your email" step added back in.
 
 ## 3. Configure environment variables
 

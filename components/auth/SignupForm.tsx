@@ -12,7 +12,7 @@ import { BuyerSignupFields, type BuyerFieldsValue } from "./BuyerSignupFields";
 import { SellerSignupFields, type SellerFieldsValue } from "./SellerSignupFields";
 import type { UserRole } from "@/types";
 
-type Step = "role" | "verify" | "profile" | "confirmEmail";
+type Step = "role" | "verify" | "profile";
 type Method = "phone" | "email";
 
 export function SignupForm() {
@@ -46,7 +46,10 @@ export function SignupForm() {
     setSellerFields((prev) => ({ ...prev, email }));
 
     if (!hasSession) {
-      setStep("confirmEmail");
+      // Email confirmation is disabled in Supabase for this project, so
+      // signUp() should always return a session immediately. If it doesn't,
+      // something's misconfigured — surface it instead of stalling silently.
+      setError("Couldn't finish signing you up automatically. Please try again.");
       return;
     }
     const supabase = createClient();
@@ -105,23 +108,18 @@ export function SignupForm() {
         ) : (
           <EmailPasswordFields onSignedUp={handleEmailSignedUp} />
         )}
+        {error && <p className="text-sm text-primary">{error}</p>}
         <button
           type="button"
-          onClick={() => setMethod(method === "phone" ? "email" : "phone")}
+          onClick={() => {
+            setError(null);
+            setMethod(method === "phone" ? "email" : "phone");
+          }}
           className="text-sm text-muted hover:text-primary"
         >
           {method === "phone" ? "Sign up with email instead" : "Sign up with phone instead"}
         </button>
       </div>
-    );
-  }
-
-  if (step === "confirmEmail") {
-    return (
-      <p className="text-sm text-foreground">
-        Check your email to confirm your account. Once confirmed, log in and we&apos;ll finish
-        setting up your profile.
-      </p>
     );
   }
 
