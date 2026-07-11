@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getSellerCreditsBalance } from "@/lib/queries";
 import { Button } from "@/components/ui/Button";
 import { LogoutButton } from "./LogoutButton";
 import { MobileNav } from "./MobileNav";
@@ -9,6 +10,24 @@ export async function Header() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  let role: "buyer" | "seller" | null = null;
+  let creditsBalance: number | null = null;
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    role = profile?.role ?? null;
+    if (role === "seller") {
+      creditsBalance = await getSellerCreditsBalance(supabase, user.id);
+    }
+  }
+
+  const postHref = role === "seller" ? "/dashboard/listings/new" : "/now/new";
+  const postLabel = role === "seller" ? "Post an ad" : "Post a need";
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-white/90 backdrop-blur">
@@ -21,7 +40,10 @@ export async function Header() {
           <Link href="/" className="text-sm font-medium text-foreground hover:text-primary">
             Browse
           </Link>
-          {user && (
+          <Link href="/now" className="text-sm font-medium text-foreground hover:text-primary">
+            Doopido Now
+          </Link>
+          {user && role === "seller" && (
             <>
               <Link
                 href="/dashboard/listings"
@@ -30,12 +52,34 @@ export async function Header() {
                 My listings
               </Link>
               <Link
-                href="/dashboard/profile"
+                href="/dashboard/bids"
                 className="text-sm font-medium text-foreground hover:text-primary"
               >
-                Profile
+                My bids
+              </Link>
+              <Link
+                href="/dashboard/credits"
+                className="text-sm font-medium text-foreground hover:text-primary"
+              >
+                Credits{creditsBalance !== null ? ` (${creditsBalance})` : ""}
               </Link>
             </>
+          )}
+          {user && role === "buyer" && (
+            <Link
+              href="/dashboard/needs"
+              className="text-sm font-medium text-foreground hover:text-primary"
+            >
+              My needs
+            </Link>
+          )}
+          {user && (
+            <Link
+              href="/dashboard/profile"
+              className="text-sm font-medium text-foreground hover:text-primary"
+            >
+              Profile
+            </Link>
           )}
         </nav>
 
@@ -43,8 +87,8 @@ export async function Header() {
           {user ? (
             <>
               <LogoutButton />
-              <Link href="/dashboard/listings/new">
-                <Button size="sm">Post an ad</Button>
+              <Link href={postHref}>
+                <Button size="sm">{postLabel}</Button>
               </Link>
             </>
           ) : (
@@ -59,7 +103,7 @@ export async function Header() {
           )}
         </div>
 
-        <MobileNav isLoggedIn={Boolean(user)} />
+        <MobileNav isLoggedIn={Boolean(user)} role={role} />
       </div>
     </header>
   );

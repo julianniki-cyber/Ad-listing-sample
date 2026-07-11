@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { LogoutButton } from "./LogoutButton";
 
-export function MobileNav({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function MobileNav({
+  isLoggedIn,
+  role,
+}: {
+  isLoggedIn: boolean;
+  role: "buyer" | "seller" | null;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -27,22 +33,61 @@ export function MobileNav({ isLoggedIn }: { isLoggedIn: boolean }) {
           <Link href="/" onClick={() => setOpen(false)} className="text-sm font-medium">
             Browse
           </Link>
-          <Link
-            href="/dashboard/listings/new"
-            onClick={() => setOpen(false)}
-            className="text-sm font-medium"
-          >
-            Post an ad
+          <Link href="/now" onClick={() => setOpen(false)} className="text-sm font-medium">
+            Doopido Now
           </Link>
           {isLoggedIn ? (
             <>
-              <Link
-                href="/dashboard/listings"
-                onClick={() => setOpen(false)}
-                className="text-sm font-medium"
-              >
-                My listings
-              </Link>
+              {role === "seller" && (
+                <>
+                  <Link
+                    href="/dashboard/listings/new"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium"
+                  >
+                    Post an ad
+                  </Link>
+                  <Link
+                    href="/dashboard/listings"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium"
+                  >
+                    My listings
+                  </Link>
+                  <Link
+                    href="/dashboard/bids"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium"
+                  >
+                    My bids
+                  </Link>
+                  <Link
+                    href="/dashboard/credits"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium"
+                  >
+                    Credits
+                  </Link>
+                </>
+              )}
+              {role === "buyer" && (
+                <>
+                  <Link
+                    href="/now/new"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium"
+                  >
+                    Post a need
+                  </Link>
+                  <Link
+                    href="/dashboard/needs"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium"
+                  >
+                    My needs
+                  </Link>
+                </>
+              )}
               <Link
                 href="/dashboard/profile"
                 onClick={() => setOpen(false)}

@@ -2,10 +2,61 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { listingSchema, profileSchema, type ListingInput, type ProfileInput } from "@/lib/validations";
+import {
+  completeProfileSchema,
+  listingSchema,
+  profileSchema,
+  type CompleteProfileInput,
+  type ListingInput,
+  type ProfileInput,
+} from "@/lib/validations";
 import { slugify } from "@/lib/slugify";
 
 type ActionResult<T = { ok: true }> = T | { error: string };
+
+export async function completeProfile(
+  input: CompleteProfileInput & { aadhaarImagePath?: string },
+): Promise<ActionResult> {
+  const parsed = completeProfileSchema.safeParse(input);
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "You must be logged in." };
+
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (existing?.role) return { error: "Your role is already set and can't be changed." };
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({
+      role: parsed.data.role,
+      full_name: parsed.data.fullName,
+      whatsapp_number: parsed.data.role === "seller" ? parsed.data.whatsappNumber : null,
+      business_name: parsed.data.role === "seller" ? parsed.data.businessName : null,
+    })
+    .eq("id", user.id);
+  if (profileError) return { error: profileError.message };
+
+  const { error: privateError } = await supabase.from("profile_private").upsert(
+    {
+      profile_id: user.id,
+      email: parsed.data.email,
+      aadhaar_image_path: input.aadhaarImagePath ?? null,
+    },
+    { onConflict: "profile_id" },
+  );
+  if (privateError) return { error: privateError.message };
+
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
 
 export async function createListing(
   input: ListingInput,

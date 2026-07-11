@@ -1,9 +1,22 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCategories } from "@/lib/queries";
 import { ListingForm } from "@/components/forms/ListingForm";
 
 export default async function NewListingPage() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (profile?.role !== "seller") redirect("/dashboard");
+
   const categories = await getCategories(supabase);
 
   return (
