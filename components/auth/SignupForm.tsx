@@ -3,87 +3,100 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { authSchema } from "@/lib/validations";
-import { Input } from "@/components/ui/Input";
+import { completeProfile } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/Button";
+import { RoleToggle } from "./RoleToggle";
+import { PhoneOtpFields } from "./PhoneOtpFields";
+import { BuyerSignupFields, type BuyerFieldsValue } from "./BuyerSignupFields";
+import { SellerSignupFields, type SellerFieldsValue } from "./SellerSignupFields";
+import type { UserRole } from "@/types";
+
+type Step = "role" | "phone" | "profile";
 
 export function SignupForm() {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [step, setStep] = useState<Step>("role");
+  const [role, setRole] = useState<UserRole>("buyer");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [buyerFields, setBuyerFields] = useState<BuyerFieldsValue>({ fullName: "", email: "" });
+  const [sellerFields, setSellerFields] = useState<SellerFieldsValue>({
+    fullName: "",
+    email: "",
+    whatsappNumber: "",
+    businessName: "",
+  });
+  const [aadhaarImagePath, setAadhaarImagePath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [confirmationSent, setConfirmationSent] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handlePhoneVerified() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) setUserId(user.id);
+    setStep("profile");
+  }
+
+  async function handleProfileSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const result = authSchema.safeParse({ email, password });
-    if (!result.success) {
-      setError(result.error.issues[0]?.message ?? "Invalid input");
+    if (role === "seller" && !aadhaarImagePath) {
+      setError("Please upload your Aadhaar card before continuing.");
       return;
     }
 
     setLoading(true);
-    const supabase = createClient();
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: result.data.email,
-      password: result.data.password,
-      options: { data: { full_name: fullName } },
-    });
+    const result =
+      role === "buyer"
+        ? await completeProfile({ role: "buyer", ...buyerFields })
+        : await completeProfile({
+            role: "seller",
+            ...sellerFields,
+            aadhaarImagePath: aadhaarImagePath ?? undefined,
+          });
     setLoading(false);
 
-    if (signUpError) {
-      setError(signUpError.message);
+    if ("error" in result) {
+      setError(result.error);
       return;
     }
 
-    if (data.session) {
-      router.push("/dashboard/listings");
-      router.refresh();
-    } else {
-      setConfirmationSent(true);
-    }
+    router.push("/dashboard");
+    router.refresh();
   }
 
-  if (confirmationSent) {
+  if (step === "role") {
     return (
-      <p className="text-sm text-foreground">
-        Check your email to confirm your account, then log in.
-      </p>
+      <div className="space-y-6">
+        <RoleToggle role={role} onChange={setRole} />
+        <Button onClick={() => setStep("phone")} className="w-full">
+          Continue
+        </Button>
+      </div>
     );
   }
 
+  if (step === "phone") {
+    return <PhoneOtpFields shouldCreateUser={true} onVerified={handlePhoneVerified} />;
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-foreground">Full name</label>
-        <Input
-          type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
+    <form onSubmit={handleProfileSubmit} className="space-y-4">
+      {role === "buyer" ? (
+        <BuyerSignupFields value={buyerFields} onChange={setBuyerFields} />
+      ) : (
+        <SellerSignupFields
+          value={sellerFields}
+          onChange={setSellerFields}
+          userId={userId ?? ""}
+          onAadhaarUploaded={setAadhaarImagePath}
         />
-      </div>
-      <div>
-        <label className="mb-1 block text-sm font-medium text-foreground">Email</label>
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </div>
-      <div>
-        <label className="mb-1 block text-sm font-medium text-foreground">Password</label>
-        <Input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-        />
-      </div>
+      )}
       {error && <p className="text-sm text-primary">{error}</p>}
       <Button type="submit" disabled={loading} className="w-full">
-        {loading ? "Creating account…" : "Sign up"}
+        {loading ? "Finishing up…" : "Complete signup"}
       </Button>
     </form>
   );
