@@ -18,7 +18,7 @@ export function MobileNav({
       <button
         aria-label="Toggle menu"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-zinc-100"
+        className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface-alt"
       >
         <span className="sr-only">Menu</span>
         <div className="space-y-1.5">
@@ -29,7 +29,7 @@ export function MobileNav({
       </button>
 
       {open && (
-        <div className="absolute inset-x-0 top-16 z-40 flex flex-col gap-4 border-b border-border bg-white p-4 shadow-sm">
+        <div className="absolute inset-x-0 top-16 z-40 flex flex-col gap-4 border-b border-border bg-background p-4 shadow-sm">
           <Link href="/" onClick={() => setOpen(false)} className="text-sm font-medium">
             Browse
           </Link>

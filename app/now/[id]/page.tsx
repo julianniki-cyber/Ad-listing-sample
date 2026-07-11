@@ -62,7 +62,7 @@ export default async function NeedPostDetailPage({
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-foreground">{needPost.headline}</h1>
+        <h1 className="text-2xl font-extrabold text-foreground">{needPost.headline}</h1>
         <Badge variant={isOpen ? "primary" : "neutral"}>
           {isOpen ? "Open" : "Offer accepted"}
         </Badge>
@@ -77,7 +77,9 @@ export default async function NeedPostDetailPage({
         {needPost.budget !== null && (
           <>
             <span>&middot;</span>
-            <span className="font-medium text-primary">Budget: {formatPrice(needPost.budget)}</span>
+            <span className="font-mono font-bold text-primary">
+              Budget: {formatPrice(needPost.budget)}
+            </span>
           </>
         )}
       </div>
@@ -86,10 +88,10 @@ export default async function NeedPostDetailPage({
       <p className="mt-4 text-sm text-muted">Posted by {needPost.buyer?.full_name ?? "Buyer"}</p>
 
       {!isOpen && acceptedBid && (
-        <div className="mt-6 rounded-2xl border border-primary bg-primary-soft p-4">
-          <p className="text-sm font-medium text-foreground">
+        <div className="mt-6 rounded-2xl border border-success-border bg-success-soft p-4">
+          <p className="text-sm font-semibold text-success-text">
             Offer accepted: {acceptedBid.seller?.business_name ?? acceptedBid.seller?.full_name} at{" "}
-            {formatPrice(acceptedBid.amount)}
+            <span className="font-mono">{formatPrice(acceptedBid.amount)}</span>
           </p>
         </div>
       )}

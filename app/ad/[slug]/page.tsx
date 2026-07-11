@@ -30,10 +30,12 @@ export default async function AdDetailPage({
 
         <div>
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-foreground">{listing.title}</h1>
+            <h1 className="text-2xl font-extrabold text-foreground">{listing.title}</h1>
             {isFeatured && <FeaturedBadge />}
           </div>
-          <p className="mt-2 text-3xl font-bold text-primary">{formatPrice(listing.price)}</p>
+          <p className="mt-2 font-mono text-3xl font-extrabold text-primary">
+            {formatPrice(listing.price)}
+          </p>
 
           <div className="mt-4 flex flex-wrap gap-3 text-sm text-muted">
             <span>{listing.category?.name}</span>

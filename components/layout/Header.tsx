@@ -30,45 +30,48 @@ export async function Header() {
   const postLabel = role === "seller" ? "Post an ad" : "Post a need";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur">
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="text-xl font-bold text-primary">
+        <Link href="/" className="text-xl font-extrabold tracking-tight text-primary">
           Doopido
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          <Link href="/" className="text-sm font-medium text-foreground hover:text-primary">
+          <Link href="/" className="text-sm font-semibold text-foreground hover:text-primary">
             Browse
           </Link>
-          <Link href="/now" className="text-sm font-medium text-foreground hover:text-primary">
-            Doopido Now
+          <Link href="/now">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-[var(--primary-gradient-from)] to-[var(--primary-gradient-to)] px-4 py-1.5 text-xs font-extrabold text-white shadow-sm shadow-primary/30 transition-shadow hover:shadow-md hover:shadow-primary/40">
+              <span className="h-1.5 w-1.5 rounded-full bg-white" />
+              Doopido Now
+            </span>
           </Link>
           {user && role === "seller" && (
             <>
               <Link
                 href="/dashboard/listings"
-                className="text-sm font-medium text-foreground hover:text-primary"
+                className="text-sm font-semibold text-foreground hover:text-primary"
               >
                 My listings
               </Link>
               <Link
                 href="/dashboard/bids"
-                className="text-sm font-medium text-foreground hover:text-primary"
+                className="text-sm font-semibold text-foreground hover:text-primary"
               >
                 My bids
               </Link>
               <Link
                 href="/dashboard/credits"
-                className="text-sm font-medium text-foreground hover:text-primary"
+                className="font-mono text-xs font-bold text-secondary-text hover:text-primary"
               >
-                Credits{creditsBalance !== null ? ` (${creditsBalance})` : ""}
+                {creditsBalance !== null ? `${creditsBalance} cr` : "Credits"}
               </Link>
             </>
           )}
           {user && role === "buyer" && (
             <Link
               href="/dashboard/needs"
-              className="text-sm font-medium text-foreground hover:text-primary"
+              className="text-sm font-semibold text-foreground hover:text-primary"
             >
               My needs
             </Link>
@@ -76,28 +79,32 @@ export async function Header() {
           {user && (
             <Link
               href="/dashboard/profile"
-              className="text-sm font-medium text-foreground hover:text-primary"
+              className="text-sm font-semibold text-foreground hover:text-primary"
             >
               Profile
             </Link>
           )}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
               <LogoutButton />
               <Link href={postHref}>
-                <Button size="sm">{postLabel}</Button>
+                <Button variant="secondary" size="sm">
+                  {postLabel}
+                </Button>
               </Link>
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-medium text-foreground hover:text-primary">
+              <Link href="/login" className="text-sm font-semibold text-foreground hover:text-primary">
                 Log in
               </Link>
               <Link href="/signup">
-                <Button size="sm">Sign up</Button>
+                <Button variant="secondary" size="sm">
+                  Sign up
+                </Button>
               </Link>
             </>
           )}

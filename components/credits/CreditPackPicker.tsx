@@ -31,10 +31,12 @@ export function CreditPackPicker({
             />
             <div>
               <p className="text-sm font-semibold text-foreground">{pack.name}</p>
-              <p className="text-xs text-muted">{pack.credits} credits</p>
+              <p className="font-mono text-xs font-bold text-muted">{pack.credits} credits</p>
             </div>
           </div>
-          <p className="text-sm font-semibold text-primary">{formatPrice(pack.price_inr)}</p>
+          <p className="font-mono text-sm font-bold text-primary">
+            {formatPrice(pack.price_inr)}
+          </p>
         </label>
       ))}
     </div>

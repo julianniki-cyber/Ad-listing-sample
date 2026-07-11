@@ -32,9 +32,9 @@ export default async function CreditsPage() {
         Spend credits to reveal all bids on a Doopido Now request.
       </p>
 
-      <div className="mt-6 rounded-2xl border border-border p-4">
-        <p className="text-sm text-muted">Current balance</p>
-        <p className="text-3xl font-bold text-primary">{balance}</p>
+      <div className="mt-6 rounded-2xl border border-border-soft bg-white p-4">
+        <p className="text-sm font-semibold text-muted">Current balance</p>
+        <p className="font-mono text-3xl font-extrabold text-primary">{balance}</p>
       </div>
 
       <div className="mt-8">
@@ -53,13 +53,15 @@ export default async function CreditsPage() {
             {ledger.map((entry) => (
               <div
                 key={entry.id}
-                className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm"
+                className="flex items-center justify-between rounded-xl border border-border-soft bg-white px-3.5 py-2.5 text-sm"
               >
-                <span className="text-muted">
+                <span className="font-medium text-muted">
                   {entry.reason === "purchase" ? "Purchased" : "Spent on reveal"} &middot;{" "}
                   {formatRelativeDate(entry.created_at)}
                 </span>
-                <span className={entry.delta > 0 ? "font-medium text-primary" : "font-medium text-foreground"}>
+                <span
+                  className={`font-mono font-bold ${entry.delta > 0 ? "text-success-text" : "text-foreground"}`}
+                >
                   {entry.delta > 0 ? "+" : ""}
                   {entry.delta}
                 </span>

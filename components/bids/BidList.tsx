@@ -53,14 +53,14 @@ export function BidList({
               <p className="text-sm font-semibold text-foreground">
                 {bid.seller?.business_name ?? bid.seller?.full_name ?? "Seller"}
               </p>
-              {bid.id === bestBidId && <Badge>Best bid so far</Badge>}
-              {bid.id === acceptedBidId && <Badge>Accepted</Badge>}
+              {bid.id === bestBidId && <Badge variant="dark">Best bid so far</Badge>}
+              {bid.id === acceptedBidId && <Badge variant="success">Accepted</Badge>}
             </div>
             {bid.message && <p className="mt-1 text-sm text-muted">{bid.message}</p>}
             <p className="mt-1 text-xs text-muted">{formatRelativeDate(bid.created_at)}</p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            <p className="text-sm font-semibold text-primary">{formatPrice(bid.amount)}</p>
+            <p className="font-mono text-sm font-bold text-primary">{formatPrice(bid.amount)}</p>
             {canAccept && (
               <Button
                 size="sm"

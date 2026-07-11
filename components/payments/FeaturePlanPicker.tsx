@@ -34,7 +34,9 @@ export function FeaturePlanPicker({
               <p className="text-xs text-muted">Priority placement + featured badge</p>
             </div>
           </div>
-          <p className="text-sm font-semibold text-primary">{formatPrice(plan.price_inr)}</p>
+          <p className="font-mono text-sm font-bold text-primary">
+            {formatPrice(plan.price_inr)}
+          </p>
         </label>
       ))}
     </div>

@@ -7,9 +7,9 @@ export function AdCard({ listing }: { listing: ListingFeedItem }) {
   return (
     <Link
       href={`/ad/${listing.slug}`}
-      className="group block overflow-hidden rounded-2xl border border-border bg-white transition-shadow hover:shadow-md"
+      className="group block overflow-hidden rounded-2xl border border-border-soft bg-white transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-foreground/5"
     >
-      <div className="relative overflow-hidden bg-zinc-100">
+      <div className="relative overflow-hidden bg-surface-alt">
         {listing.thumbnail_url ? (
           // Intentionally a plain <img>, not next/image: the masonry layout relies on
           // each image's natural intrinsic aspect ratio for variable card heights.
@@ -21,7 +21,7 @@ export function AdCard({ listing }: { listing: ListingFeedItem }) {
             className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="flex aspect-square w-full items-center justify-center text-muted">
+          <div className="flex aspect-square w-full items-center justify-center text-xs font-bold uppercase tracking-wide text-muted">
             No image
           </div>
         )}
@@ -32,10 +32,12 @@ export function AdCard({ listing }: { listing: ListingFeedItem }) {
         )}
       </div>
 
-      <div className="space-y-1 p-3">
-        <p className="text-base font-semibold text-primary">{formatPrice(listing.price)}</p>
-        <p className="truncate text-sm font-medium text-foreground">{listing.title}</p>
-        <p className="truncate text-xs text-muted">{listing.location_city}</p>
+      <div className="space-y-1 p-3.5">
+        <p className="font-mono text-base font-extrabold text-primary">
+          {formatPrice(listing.price)}
+        </p>
+        <p className="truncate text-sm font-bold text-foreground">{listing.title}</p>
+        <p className="truncate text-xs font-medium text-muted">{listing.location_city}</p>
       </div>
     </Link>
   );

@@ -21,12 +21,14 @@ export function MyBidRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p className="truncate text-sm font-semibold text-foreground">{needPost.headline}</p>
-          {won && <Badge>Won</Badge>}
+          {won && <Badge variant="success">Won</Badge>}
           {lost && <Badge variant="neutral">Not selected</Badge>}
           {!won && !lost && <Badge variant="neutral">Pending</Badge>}
         </div>
         <p className="text-xs text-muted">
-          Your bid: {formatPrice(bid.amount)} &middot; {formatRelativeDate(bid.created_at)}
+          Your bid:{" "}
+          <span className="font-mono font-bold text-foreground">{formatPrice(bid.amount)}</span>
+          {" "}&middot; {formatRelativeDate(bid.created_at)}
         </p>
       </div>
       <Link href={`/now/${needPost.id}`}>

@@ -1,29 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --muted: #6b6b6b;
-  --border: #e5e5e5;
-  --primary: #dc2626;
-  --primary-hover: #b91c1c;
-  --primary-soft: #fef2f2;
+  --background: #faf7f2;
+  --foreground: #17140f;
+  --secondary-text: #514c43;
+  --muted: #9a948a;
+  --border: #e9e5de;
+  --border-soft: #efebe4;
+  --primary: #ff3b1f;
+  --primary-hover: #d6301a;
+  --primary-gradient-from: #ff5a38;
+  --primary-gradient-to: #e7300f;
+  --primary-soft: #fdece8;
+  --success: #1fa855;
+  --success-hover: #188a45;
+  --success-text: #1b7f3e;
+  --success-soft: #e7f6ec;
+  --success-border: #bee6c9;
+  --surface-alt: #f3f1ec;
+  --surface-alt-2: #ebe8e2;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-secondary-text: var(--secondary-text);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-success-text: var(--success-text);
+  --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
+  --color-surface-alt: var(--surface-alt);
+  --color-surface-alt-2: var(--surface-alt-2);
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dad7d1;
+  border-radius: 8px;
 }

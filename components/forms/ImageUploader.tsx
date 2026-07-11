@@ -101,7 +101,7 @@ export function ImageUploader({
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
         {images.map((image) => (
-          <div key={image.id} className="group relative aspect-square overflow-hidden rounded-xl bg-zinc-100">
+          <div key={image.id} className="group relative aspect-square overflow-hidden rounded-xl bg-surface-alt">
             <Image src={image.url} alt="" fill className="object-cover" sizes="150px" />
             <button
               type="button"

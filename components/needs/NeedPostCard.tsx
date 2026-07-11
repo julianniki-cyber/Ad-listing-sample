@@ -7,14 +7,16 @@ export function NeedPostCard({ needPost }: { needPost: NeedPostFeedItem }) {
   return (
     <Link
       href={`/now/${needPost.id}`}
-      className="block rounded-2xl border border-border bg-white p-4 transition-shadow hover:shadow-md"
+      className="block rounded-2xl border border-border-soft bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-foreground/5"
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-base font-semibold text-foreground">{needPost.headline}</h3>
+        <h3 className="text-base font-extrabold text-foreground">{needPost.headline}</h3>
         <Badge variant="neutral">{needPost.category_name}</Badge>
       </div>
-      <p className="mt-1 line-clamp-2 text-sm text-muted">{needPost.description}</p>
-      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted">
+      <p className="mt-1 line-clamp-2 text-sm font-medium text-secondary-text">
+        {needPost.description}
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-semibold text-muted">
         <span>{needPost.location_city}</span>
         <span>&middot;</span>
         <span>{formatRelativeDate(needPost.created_at)}</span>
@@ -23,7 +25,9 @@ export function NeedPostCard({ needPost }: { needPost: NeedPostFeedItem }) {
         {needPost.budget !== null && (
           <>
             <span>&middot;</span>
-            <span className="font-medium text-primary">Budget: {formatPrice(needPost.budget)}</span>
+            <span className="font-mono font-bold text-primary">
+              Budget: {formatPrice(needPost.budget)}
+            </span>
           </>
         )}
       </div>

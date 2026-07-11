@@ -20,7 +20,7 @@ export function CategoryPills({ categories }: { categories: Category[] }) {
     <div className="flex gap-2 overflow-x-auto pb-1">
       <button
         onClick={() => selectCategory(null)}
-        className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+        className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors ${
           !activeCategory
             ? "border-primary bg-primary text-white"
             : "border-border bg-white text-foreground hover:border-primary"
@@ -32,7 +32,7 @@ export function CategoryPills({ categories }: { categories: Category[] }) {
         <button
           key={category.id}
           onClick={() => selectCategory(category.slug)}
-          className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+          className={`shrink-0 rounded-full border px-4 py-1.5 text-sm font-bold transition-colors ${
             activeCategory === category.slug
               ? "border-primary bg-primary text-white"
               : "border-border bg-white text-foreground hover:border-primary"

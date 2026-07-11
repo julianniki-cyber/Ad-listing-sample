@@ -9,7 +9,7 @@ export function AdGallery({ images, title }: { images: ListingImage[]; title: st
 
   if (images.length === 0) {
     return (
-      <div className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-zinc-100 text-muted">
+      <div className="flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-surface-alt text-muted">
         No image
       </div>
     );
@@ -19,7 +19,7 @@ export function AdGallery({ images, title }: { images: ListingImage[]; title: st
 
   return (
     <div>
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-zinc-100">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-alt">
         <Image
           src={active.url}
           alt={title}

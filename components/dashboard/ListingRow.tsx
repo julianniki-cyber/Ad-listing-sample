@@ -29,7 +29,7 @@ export function ListingRow({ listing }: { listing: ListingWithRelations }) {
 
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-border p-4">
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-alt">
         {thumbnail && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={thumbnail.url} alt="" className="h-full w-full object-cover" />
@@ -42,7 +42,7 @@ export function ListingRow({ listing }: { listing: ListingWithRelations }) {
           {isFeatured && <Badge>Featured</Badge>}
           {listing.status === "sold" && <Badge variant="neutral">Sold</Badge>}
         </div>
-        <p className="text-sm text-primary">{formatPrice(listing.price)}</p>
+        <p className="font-mono text-sm font-bold text-primary">{formatPrice(listing.price)}</p>
         <p className="text-xs text-muted">{listing.location_city}</p>
       </div>
 
