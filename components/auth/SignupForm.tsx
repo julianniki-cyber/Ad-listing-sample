@@ -7,15 +7,18 @@ import { completeProfile } from "@/app/(dashboard)/dashboard/actions";
 import { Button } from "@/components/ui/Button";
 import { RoleToggle } from "./RoleToggle";
 import { PhoneOtpFields } from "./PhoneOtpFields";
+import { EmailPasswordFields } from "./EmailPasswordFields";
 import { BuyerSignupFields, type BuyerFieldsValue } from "./BuyerSignupFields";
 import { SellerSignupFields, type SellerFieldsValue } from "./SellerSignupFields";
 import type { UserRole } from "@/types";
 
-type Step = "role" | "phone" | "profile";
+type Step = "role" | "verify" | "profile" | "confirmEmail";
+type Method = "phone" | "email";
 
 export function SignupForm() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("role");
+  const [method, setMethod] = useState<Method>("phone");
   const [role, setRole] = useState<UserRole>("buyer");
   const [userId, setUserId] = useState<string | null>(null);
   const [buyerFields, setBuyerFields] = useState<BuyerFieldsValue>({ fullName: "", email: "" });
@@ -30,6 +33,22 @@ export function SignupForm() {
   const [loading, setLoading] = useState(false);
 
   async function handlePhoneVerified() {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) setUserId(user.id);
+    setStep("profile");
+  }
+
+  async function handleEmailSignedUp(hasSession: boolean, email: string) {
+    setBuyerFields((prev) => ({ ...prev, email }));
+    setSellerFields((prev) => ({ ...prev, email }));
+
+    if (!hasSession) {
+      setStep("confirmEmail");
+      return;
+    }
     const supabase = createClient();
     const {
       data: { user },
@@ -71,15 +90,39 @@ export function SignupForm() {
     return (
       <div className="space-y-6">
         <RoleToggle role={role} onChange={setRole} />
-        <Button onClick={() => setStep("phone")} className="w-full">
+        <Button onClick={() => setStep("verify")} className="w-full">
           Continue
         </Button>
       </div>
     );
   }
 
-  if (step === "phone") {
-    return <PhoneOtpFields shouldCreateUser={true} onVerified={handlePhoneVerified} />;
+  if (step === "verify") {
+    return (
+      <div className="space-y-4">
+        {method === "phone" ? (
+          <PhoneOtpFields shouldCreateUser={true} onVerified={handlePhoneVerified} />
+        ) : (
+          <EmailPasswordFields onSignedUp={handleEmailSignedUp} />
+        )}
+        <button
+          type="button"
+          onClick={() => setMethod(method === "phone" ? "email" : "phone")}
+          className="text-sm text-muted hover:text-primary"
+        >
+          {method === "phone" ? "Sign up with email instead" : "Sign up with phone instead"}
+        </button>
+      </div>
+    );
+  }
+
+  if (step === "confirmEmail") {
+    return (
+      <p className="text-sm text-foreground">
+        Check your email to confirm your account. Once confirmed, log in and we&apos;ll finish
+        setting up your profile.
+      </p>
+    );
   }
 
   return (
