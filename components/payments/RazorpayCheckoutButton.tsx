@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 
 declare global {
@@ -22,29 +21,34 @@ function loadRazorpayScript(): Promise<boolean> {
 }
 
 export function RazorpayCheckoutButton({
-  listingId,
-  planId,
+  createOrderUrl,
+  verifyUrl,
+  requestBody,
+  description,
+  buttonLabel,
+  disabled,
+  onSuccess,
 }: {
-  listingId: string;
-  planId: string | null;
+  createOrderUrl: string;
+  verifyUrl: string;
+  requestBody: Record<string, unknown>;
+  description: string;
+  buttonLabel: string;
+  disabled?: boolean;
+  onSuccess: () => void;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleCheckout() {
-    if (!planId) {
-      setError("Choose a plan first.");
-      return;
-    }
     setError(null);
     setLoading(true);
 
     try {
-      const createRes = await fetch("/api/razorpay/create-order", {
+      const createRes = await fetch(createOrderUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listingId, planId }),
+        body: JSON.stringify(requestBody),
       });
       const createData = await createRes.json();
       if (!createRes.ok) throw new Error(createData.error ?? "Could not start checkout.");
@@ -58,20 +62,19 @@ export function RazorpayCheckoutButton({
         currency: createData.currency,
         order_id: createData.orderId,
         name: "Doopido",
-        description: `Feature listing — ${createData.plan.name}`,
+        description,
         handler: async (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
           razorpay_signature: string;
         }) => {
-          const verifyRes = await fetch("/api/razorpay/verify", {
+          const verifyRes = await fetch(verifyUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response),
           });
           if (verifyRes.ok) {
-            router.push("/dashboard/listings?featured=1");
-            router.refresh();
+            onSuccess();
           } else {
             setError("Payment succeeded but verification failed. Contact support.");
           }
@@ -90,8 +93,8 @@ export function RazorpayCheckoutButton({
   return (
     <div className="space-y-2">
       {error && <p className="text-sm text-primary">{error}</p>}
-      <Button onClick={handleCheckout} disabled={loading || !planId}>
-        {loading ? "Opening checkout…" : "Feature this ad"}
+      <Button onClick={handleCheckout} disabled={loading || disabled}>
+        {loading ? "Opening checkout…" : buttonLabel}
       </Button>
     </div>
   );
