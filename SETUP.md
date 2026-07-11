@@ -15,20 +15,43 @@ configured" notice on the feature/promote flow.
 
 1. In your Supabase project, open the **SQL Editor** (left sidebar).
 2. Click **New query**.
-3. Open [`supabase/schema.sql`](./supabase/schema.sql) from this repo, copy its entire contents,
-   and paste it into the SQL editor.
-4. Click **Run**. This creates every table, index, Row Level Security policy, the public
-   `listing-images` storage bucket, and seeds the default categories and feature-plan pricing
-   tiers. It's safe to re-run — inserts use `on conflict do nothing`.
+3. Open [`supabase/schema.sql`](./supabase/schema.sql) from this repo, copy its **entire** contents
+   (both the Phase 1 and Phase 2 sections — it's one file), and paste it into the SQL editor.
+4. Click **Run**. This creates every table, index, Row Level Security policy, RPC function, the
+   `listing-images` and `seller-documents` storage buckets, and seeds the default categories,
+   feature-plan pricing, and credit-pack pricing. **The whole file is safe to run more than once**
+   — every statement is idempotent (`if not exists`, `create or replace`, or an explicit
+   `drop ... if exists` before recreating), so if you already ran an earlier version of this file,
+   just re-paste and re-run the current one to pick up new tables/policies.
 5. Confirm it worked: in **Table Editor**, you should see `profiles`, `categories`, `listings`,
-   `listing_images`, `feature_plans`, `payments`, and `featured_listings`, with `categories` and
-   `feature_plans` already populated.
+   `listing_images`, `feature_plans`, `payments`, `featured_listings`, `need_posts`, `bids`,
+   `credit_packs`, `credit_payments`, `credit_ledger`, `seller_credits`, `seller_verifications`,
+   `profile_private`, and `reviews`, with `categories`, `feature_plans`, and `credit_packs` already
+   populated with rows.
+
+### Enable phone (OTP) sign-in
+
+Doopido's primary login is a mobile-number one-time code, not a password. Supabase needs an SMS
+provider configured to actually send the code:
+
+1. Go to **Authentication → Providers → Phone** and toggle it **on**.
+2. Pick an SMS provider (Twilio is the most common — sign up at
+   [twilio.com](https://www.twilio.com), grab a phone number, and copy your Account SID, Auth
+   Token, and Messaging Service SID/from-number into the fields Supabase shows for the Twilio
+   option). MessageBird, Vonage, and TextLocal are also supported if you prefer one of those.
+3. For local development without spending on real SMS, scroll to **Test OTPs** on that same page
+   and add a test phone number with a fixed code (e.g. `+911234567890` → `123456`) — logging in
+   with that number always accepts that code, no real SMS sent.
+4. Leave **Authentication → Providers → Email** enabled too — some early accounts signed up with
+   email/password before this change and still need it to log in (see `components/auth/LoginForm`'s
+   "Have an existing email login?" option, and the phone-linking prompt shown to those accounts
+   once they're in the dashboard).
 
 ### Optional but recommended for local testing: disable email confirmation
 
-By default Supabase requires users to click a confirmation link before they can log in. For quick
-local testing, go to **Authentication → Providers → Email** and turn off **Confirm email**. Turn
-it back on before going live.
+By default Supabase requires users to click a confirmation link before they can log in with email.
+For quick local testing, go to **Authentication → Providers → Email** and turn off **Confirm
+email**. Turn it back on before going live.
 
 ## 3. Configure environment variables
 
@@ -76,6 +99,22 @@ post, and manage listings; they just won't be able to pay to feature one yet.
    `payment.failed`, and copy the generated **Webhook Secret** into `RAZORPAY_WEBHOOK_SECRET`.
 7. When you're ready to accept real payments, generate **Live Mode** keys the same way and swap
    them in for production (see step 6 below for where to set these on Vercel).
+
+The same keys also power sellers buying credit packs (**Dashboard → Credits**) — no separate setup
+needed; it shares the create-order/verify/webhook routes and Razorpay account.
+
+## Verifying sellers (Aadhaar review)
+
+When a seller signs up, they upload an Aadhaar photo to a private Storage bucket
+(`seller-documents`) — nobody but that seller and you (via the dashboard) can read it; there's no
+automated ID-check API wired up. To verify a seller and show their "Verified" badge:
+
+1. In Supabase, go to **Storage → seller-documents** and open `<their-user-id>/...` to view the
+   file.
+2. In **Table Editor → seller_verifications**, find their row (by `profile_id`) and set
+   `is_verified` to `true`.
+
+There's no in-app admin screen for this yet — it's a manual step per seller for now.
 
 ## 5. Connect the GitHub repository
 
